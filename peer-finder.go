@@ -75,6 +75,7 @@ var (
 	namespace      = flag.String("ns", "", "The namespace this pod is running in. If unspecified, the POD_NAMESPACE env var is used.")
 	domain         = flag.String("domain", "", "The Cluster Domain which is used by the Cluster, if not set tries to determine it from /etc/resolv.conf file.")
 	selector       = flag.String("selector", "", "The selector is used to select the pods whose ip will use to form peers.")
+	once           = flag.Bool("once", false, "Run once and exit.")
 )
 
 func lookupDNS(svcName string) (sets.Set[string], error) {
@@ -274,6 +275,11 @@ func main() {
 		log.Error(err, "peer finder exiting.")
 	}
 	klog.Flush()
+
+	if *once {
+		log.Info("Exiting because -once is set.")
+		return
+	}
 
 	log.Info("Block until Kubernetes sends the signal SIGKILL .")
 	select {}
